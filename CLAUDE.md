@@ -1,6 +1,6 @@
 # Calendar Ticker
 
-OLED-optimised news ticker displaying Google Calendar events on big-screen displays.
+LG OLED TV-optimised news ticker displaying Google Calendar events on big-screen displays.
 
 ## Quick Links
 

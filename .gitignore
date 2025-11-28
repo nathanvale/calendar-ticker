@@ -27,7 +27,6 @@ Thumbs.db
 
 # Editor/IDE
 .idea/
-.vscode/
 *.swp
 *.swo
 *~
