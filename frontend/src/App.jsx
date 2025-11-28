@@ -1,212 +1,212 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import './App.css'
+import { useCallback, useEffect, useRef, useState } from "react";
+import "./App.css";
 
 // WebSocket URL - uses relative path in production, configurable for dev
-const WS_URL = import.meta.env.VITE_WS_URL || `ws://${window.location.host}/ws`
+const WS_URL = import.meta.env.VITE_WS_URL || `ws://${window.location.host}/ws`;
 
 function App() {
-  const [events, setEvents] = useState([])
-  const [config, setConfig] = useState({
-    display: {
-      scroll_speed: 60,
-      pause_duration: 0,
-      event_gap: 100,
-      time_format: '12h',
-      position: 'bottom',
-      font_size: 42,
-      show_clock: true,
-    },
-    no_events_message: 'No upcoming events today ✨',
-  })
-  const [connected, setConnected] = useState(false)
-  const [currentTime, setCurrentTime] = useState(new Date())
-  
-  const wsRef = useRef(null)
-  const reconnectTimeoutRef = useRef(null)
-  const tickerRef = useRef(null)
-  const contentRef = useRef(null)
+	const [events, setEvents] = useState([]);
+	const [config, setConfig] = useState({
+		display: {
+			scroll_speed: 60,
+			pause_duration: 0,
+			event_gap: 100,
+			time_format: "12h",
+			position: "bottom",
+			font_size: 42,
+			show_clock: true,
+		},
+		no_events_message: "No upcoming events today ✨",
+	});
+	const [connected, setConnected] = useState(false);
+	const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Connect to WebSocket
-  const connectWebSocket = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) return
+	const wsRef = useRef(null);
+	const reconnectTimeoutRef = useRef(null);
+	const tickerRef = useRef(null);
+	const contentRef = useRef(null);
 
-    console.log('Connecting to WebSocket:', WS_URL)
-    const ws = new WebSocket(WS_URL)
+	// Connect to WebSocket
+	const connectWebSocket = useCallback(() => {
+		if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-    ws.onopen = () => {
-      console.log('WebSocket connected')
-      setConnected(true)
-    }
+		console.log("Connecting to WebSocket:", WS_URL);
+		const ws = new WebSocket(WS_URL);
 
-    ws.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data)
-        if (message.type === 'events') {
-          setEvents(message.data || [])
-          if (message.config) {
-            setConfig(prev => ({ ...prev, ...message.config }))
-          }
-        }
-      } catch (e) {
-        console.error('Error parsing message:', e)
-      }
-    }
+		ws.onopen = () => {
+			console.log("WebSocket connected");
+			setConnected(true);
+		};
 
-    ws.onclose = () => {
-      console.log('WebSocket disconnected')
-      setConnected(false)
-      // Reconnect after 5 seconds
-      reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000)
-    }
+		ws.onmessage = (event) => {
+			try {
+				const message = JSON.parse(event.data);
+				if (message.type === "events") {
+					setEvents(message.data || []);
+					if (message.config) {
+						setConfig((prev) => ({ ...prev, ...message.config }));
+					}
+				}
+			} catch (e) {
+				console.error("Error parsing message:", e);
+			}
+		};
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error)
-    }
+		ws.onclose = () => {
+			console.log("WebSocket disconnected");
+			setConnected(false);
+			// Reconnect after 5 seconds
+			reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000);
+		};
 
-    wsRef.current = ws
-  }, [])
+		ws.onerror = (error) => {
+			console.error("WebSocket error:", error);
+		};
 
-  // Initial connection
-  useEffect(() => {
-    connectWebSocket()
+		wsRef.current = ws;
+	}, []);
 
-    return () => {
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current)
-      }
-      if (wsRef.current) {
-        wsRef.current.close()
-      }
-    }
-  }, [connectWebSocket])
+	// Initial connection
+	useEffect(() => {
+		connectWebSocket();
 
-  // Update clock
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
+		return () => {
+			if (reconnectTimeoutRef.current) {
+				clearTimeout(reconnectTimeoutRef.current);
+			}
+			if (wsRef.current) {
+				wsRef.current.close();
+			}
+		};
+	}, [connectWebSocket]);
 
-  // Ticker animation
-  useEffect(() => {
-    if (!tickerRef.current || !contentRef.current || events.length === 0) return
+	// Update clock
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setCurrentTime(new Date());
+		}, 1000);
+		return () => clearInterval(interval);
+	}, []);
 
-    const ticker = tickerRef.current
-    const content = contentRef.current
-    const speed = config.display?.scroll_speed || 60
+	// Ticker animation
+	useEffect(() => {
+		if (!tickerRef.current || !contentRef.current || events.length === 0)
+			return;
 
-    // Duplicate content for seamless loop
-    const contentWidth = content.scrollWidth / 2
-    let position = 0
+		const _ticker = tickerRef.current;
+		const content = contentRef.current;
+		const speed = config.display?.scroll_speed || 60;
 
-    const animate = () => {
-      position -= speed / 60 // 60fps
-      if (position <= -contentWidth) {
-        position = 0
-      }
-      content.style.transform = `translateX(${position}px)`
-      requestAnimationFrame(animate)
-    }
+		// Duplicate content for seamless loop
+		const contentWidth = content.scrollWidth / 2;
+		let position = 0;
 
-    const animationId = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(animationId)
-  }, [events, config.display?.scroll_speed])
+		const animate = () => {
+			position -= speed / 60; // 60fps
+			if (position <= -contentWidth) {
+				position = 0;
+			}
+			content.style.transform = `translateX(${position}px)`;
+			requestAnimationFrame(animate);
+		};
 
-  // Format time for clock
-  const formatClock = (date) => {
-    const timeFormat = config.display?.time_format || '12h'
-    if (timeFormat === '12h') {
-      return date.toLocaleTimeString('en-AU', { 
-        hour: 'numeric', 
-        minute: '2-digit',
-        hour12: true 
-      }).toLowerCase()
-    }
-    return date.toLocaleTimeString('en-AU', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: false 
-    })
-  }
+		const animationId = requestAnimationFrame(animate);
+		return () => cancelAnimationFrame(animationId);
+	}, [events, config.display?.scroll_speed]);
 
-  // Render single event
-  const renderEvent = (event, index) => {
-    const fontSize = config.display?.font_size || 42
-    const importantSize = fontSize * 1.15
+	// Format time for clock
+	const formatClock = (date) => {
+		const timeFormat = config.display?.time_format || "12h";
+		if (timeFormat === "12h") {
+			return date
+				.toLocaleTimeString("en-AU", {
+					hour: "numeric",
+					minute: "2-digit",
+					hour12: true,
+				})
+				.toLowerCase();
+		}
+		return date.toLocaleTimeString("en-AU", {
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: false,
+		});
+	};
 
-    return (
-      <div 
-        key={`${event.id}-${index}`}
-        className={`event ${event.is_important ? 'important' : ''}`}
-        style={{
-          marginRight: config.display?.event_gap || 100,
-        }}
-      >
-        {config.display?.show_calendar_indicator !== false && (
-          <span 
-            className="calendar-indicator"
-            style={{ backgroundColor: event.colour }}
-          />
-        )}
-        <span 
-          className="event-time"
-          style={{ fontSize: event.is_important ? importantSize * 0.8 : fontSize * 0.8 }}
-        >
-          {event.time_str}
-        </span>
-        <span className="event-separator">—</span>
-        <span 
-          className="event-title"
-          style={{ fontSize: event.is_important ? importantSize : fontSize }}
-        >
-          {event.title}
-        </span>
-        {event.is_important && <span className="important-badge">!</span>}
-      </div>
-    )
-  }
+	// Render single event
+	const renderEvent = (event, index) => {
+		const fontSize = config.display?.font_size || 42;
+		const importantSize = fontSize * 1.15;
 
-  const position = config.display?.position || 'bottom'
+		return (
+			<div
+				key={`${event.id}-${index}`}
+				className={`event ${event.is_important ? "important" : ""}`}
+				style={{
+					marginRight: config.display?.event_gap || 100,
+				}}
+			>
+				{config.display?.show_calendar_indicator !== false && (
+					<span
+						className="calendar-indicator"
+						style={{ backgroundColor: event.colour }}
+					/>
+				)}
+				<span
+					className="event-time"
+					style={{
+						fontSize: event.is_important ? importantSize * 0.8 : fontSize * 0.8,
+					}}
+				>
+					{event.time_str}
+				</span>
+				<span className="event-separator">—</span>
+				<span
+					className="event-title"
+					style={{ fontSize: event.is_important ? importantSize : fontSize }}
+				>
+					{event.title}
+				</span>
+				{event.is_important && <span className="important-badge">!</span>}
+			</div>
+		);
+	};
 
-  return (
-    <div className="app">
-      {/* Background - pure black for OLED */}
-      <div className="background" />
+	const position = config.display?.position || "bottom";
 
-      {/* Clock */}
-      {config.display?.show_clock && (
-        <div className="clock">
-          {formatClock(currentTime)}
-        </div>
-      )}
+	return (
+		<div className="app">
+			{/* Background - pure black for OLED */}
+			<div className="background" />
 
-      {/* Connection status indicator */}
-      <div className={`connection-status ${connected ? 'connected' : 'disconnected'}`} />
+			{/* Clock */}
+			{config.display?.show_clock && (
+				<div className="clock">{formatClock(currentTime)}</div>
+			)}
 
-      {/* Ticker */}
-      <div 
-        ref={tickerRef}
-        className={`ticker ticker-${position}`}
-      >
-        {events.length > 0 ? (
-          <div ref={contentRef} className="ticker-content">
-            {/* Render events twice for seamless loop */}
-            {events.map((event, i) => renderEvent(event, i))}
-            {events.map((event, i) => renderEvent(event, i + events.length))}
-          </div>
-        ) : (
-          <div className="no-events">
-            {config.no_events_message}
-          </div>
-        )}
-      </div>
+			{/* Connection status indicator */}
+			<div
+				className={`connection-status ${connected ? "connected" : "disconnected"}`}
+			/>
 
-      {/* Subtle gradient overlay at edges */}
-      <div className={`edge-fade edge-fade-left ticker-${position}`} />
-      <div className={`edge-fade edge-fade-right ticker-${position}`} />
-    </div>
-  )
+			{/* Ticker */}
+			<div ref={tickerRef} className={`ticker ticker-${position}`}>
+				{events.length > 0 ? (
+					<div ref={contentRef} className="ticker-content">
+						{/* Render events twice for seamless loop */}
+						{events.map((event, i) => renderEvent(event, i))}
+						{events.map((event, i) => renderEvent(event, i + events.length))}
+					</div>
+				) : (
+					<div className="no-events">{config.no_events_message}</div>
+				)}
+			</div>
+
+			{/* Subtle gradient overlay at edges */}
+			<div className={`edge-fade edge-fade-left ticker-${position}`} />
+			<div className={`edge-fade edge-fade-right ticker-${position}`} />
+		</div>
+	);
 }
 
-export default App
+export default App;

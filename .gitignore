@@ -1,41 +1,70 @@
 # Dependencies
 node_modules/
+.pnp/
+.pnp.js
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 .venv/
 venv/
 env/
+*.egg-info/
 
 # Build outputs
 dist/
 build/
-*.egg-info/
+.next/
+out/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
+# Bun
+bun.lockb
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Secrets - DO NOT COMMIT THESE
-credentials.json
-token.json
-config.yaml
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-*
 
 # Logs
 *.log
 logs/
-
-# Docker
-.docker/
+.claude-session-summary
+.codemcp.log
 
 # Environment
 .env
 .env.local
 .env.*.local
+*.local
+*.local.*
+
+# Secrets - NEVER COMMIT
+credentials.json
+token.json
+config.yaml
+
+# Docker
+.docker/
+
+# Kit vector database cache
+.kit/
+
+# Local config overrides
+codemcp.toml
+settings.local.json
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Turbo/build cache
+.turbo/
