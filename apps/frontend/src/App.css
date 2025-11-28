@@ -1,0 +1,390 @@
+/**
+ * Calendar Ticker - Nine News Design System
+ *
+ * Frontend styles using Nine News brand guidelines and design system tokens.
+ * Optimised for OLED TV displays with pure black backgrounds.
+ *
+ * Design System: @calendar-ticker/design-system
+ * Font: Montserrat (Google Fonts) - similar visual to Proxima Nova
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;900&display=swap");
+
+/* Reset and base styles */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+:root {
+	/* TIER 1: Primitive tokens (from design system) */
+	--color-nine-blue: #00beff;
+	--color-nine-blue-dark: #0518c5;
+	--color-nine-black: #000000;
+	--color-nine-white: #ffffff;
+
+	--color-green-500: #10b981;
+	--color-red-500: #ef4444;
+	--color-yellow-500: #f59e0b;
+
+	--space-4: 1rem; /* 16px */
+	--space-5: 1.25rem; /* 20px */
+	--space-6: 1.5rem; /* 24px */
+	--space-10: 2.5rem; /* 40px */
+	--space-12: 3rem; /* 48px */
+	--space-16: 4rem; /* 64px */
+
+	--font-size-5xl: 2.625rem; /* 42px */
+	--font-size-6xl: 3rem; /* 48px */
+	--font-size-7xl: 4rem; /* 64px */
+
+	--font-weight-medium: 500;
+	--font-weight-bold: 700;
+	--font-weight-black: 900;
+
+	--letter-spacing-tight: -0.025em;
+
+	/* TIER 2: Semantic tokens (from design system) */
+	--color-bg-app: var(--color-nine-black);
+	--color-bg-ticker: rgba(0, 0, 0, 0.85);
+	--color-text-primary: var(--color-nine-white);
+	--color-text-secondary: rgba(255, 255, 255, 0.7);
+	--color-text-muted: rgba(255, 255, 255, 0.5);
+	--color-border-default: rgba(255, 255, 255, 0.1);
+	--color-status-success: var(--color-green-500);
+	--color-status-error: var(--color-red-500);
+	--color-event-important: var(--color-yellow-500);
+	--color-event-important-glow: rgba(245, 158, 11, 0.3);
+
+	/* Component-specific tokens */
+	--ticker-height: 100px;
+	--ticker-height-4k: 150px;
+	--ticker-padding: var(--space-6); /* 24px */
+	--ticker-event-gap: var(--space-16); /* 64px */
+	--ticker-bg: var(--color-bg-ticker);
+	--ticker-border: var(--color-border-default);
+	--ticker-title-size: var(--font-size-5xl); /* 42px */
+	--ticker-time-size: calc(var(--font-size-5xl) * 0.8); /* ~34px */
+	--ticker-clock-size: var(--font-size-7xl); /* 64px */
+	--ticker-indicator-width: 8px;
+	--ticker-indicator-height: 40px;
+
+	/* Safe margins for TV displays */
+	--safe-margin: var(--space-12); /* 48px */
+	--safe-margin-4k: var(--space-16); /* 64px */
+}
+
+html,
+body,
+#root {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	font-family:
+		"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	background: var(--color-bg-app);
+	color: var(--color-text-primary);
+}
+
+/* Pure black background for OLED */
+.background {
+	position: absolute;
+	inset: 0;
+	background: var(--color-bg-app);
+}
+
+/* Clock display */
+.clock {
+	position: absolute;
+	top: var(--safe-margin);
+	right: var(--safe-margin);
+	font-size: var(--ticker-clock-size);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-text-secondary);
+	letter-spacing: var(--letter-spacing-tight);
+	z-index: 10;
+}
+
+/* Connection status indicator */
+.connection-status {
+	position: absolute;
+	top: var(--safe-margin);
+	left: var(--safe-margin);
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	z-index: 10;
+	transition: background-color 0.3s ease;
+}
+
+.connection-status.connected {
+	background-color: var(--color-status-success);
+	box-shadow: 0 0 10px var(--color-status-success);
+}
+
+.connection-status.disconnected {
+	background-color: var(--color-status-error);
+	box-shadow: 0 0 10px var(--color-status-error);
+	animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+/* Ticker container */
+.ticker {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: var(--ticker-height);
+	display: flex;
+	align-items: center;
+	background: var(--ticker-bg);
+	border-top: 1px solid var(--ticker-border);
+	overflow: hidden;
+	z-index: 5;
+}
+
+.ticker-bottom {
+	bottom: 0;
+	border-top: 1px solid var(--ticker-border);
+	border-bottom: none;
+}
+
+.ticker-top {
+	top: 0;
+	border-bottom: 1px solid var(--ticker-border);
+	border-top: none;
+}
+
+.ticker-center {
+	top: 50%;
+	transform: translateY(-50%);
+	height: 120px;
+	border: 1px solid var(--ticker-border);
+	border-radius: 4px;
+	margin: 0 40px;
+	left: 40px;
+	right: 40px;
+}
+
+/* Ticker content - scrolling container */
+.ticker-content {
+	display: flex;
+	align-items: center;
+	white-space: nowrap;
+	will-change: transform;
+}
+
+/* Individual event */
+.event {
+	display: flex;
+	align-items: center;
+	gap: var(--space-4);
+	padding: 0 var(--space-5);
+	flex-shrink: 0;
+}
+
+.event.important {
+	animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+	0%,
+	100% {
+		filter: drop-shadow(0 0 8px var(--color-event-important-glow));
+	}
+	50% {
+		filter: drop-shadow(0 0 20px var(--color-event-important-glow));
+	}
+}
+
+/* Calendar colour indicator */
+.calendar-indicator {
+	width: var(--ticker-indicator-width);
+	height: var(--ticker-indicator-height);
+	border-radius: 4px;
+	flex-shrink: 0;
+}
+
+/* Event time */
+.event-time {
+	color: var(--color-text-secondary);
+	font-weight: var(--font-weight-medium);
+	letter-spacing: 0.5px;
+	text-transform: lowercase;
+}
+
+/* Separator */
+.event-separator {
+	color: var(--color-text-muted);
+	font-weight: 300;
+}
+
+/* Event title */
+.event-title {
+	font-weight: var(--font-weight-bold);
+	letter-spacing: var(--letter-spacing-tight);
+	color: var(--color-text-primary);
+}
+
+.event.important .event-title {
+	color: var(--color-event-important);
+}
+
+/* Important badge */
+.important-badge {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	background: var(--color-event-important);
+	color: var(--color-bg-app);
+	font-weight: var(--font-weight-black);
+	font-size: 18px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+/* No events message */
+.no-events {
+	width: 100%;
+	text-align: center;
+	font-size: 36px;
+	font-weight: var(--font-weight-medium);
+	color: var(--color-text-secondary);
+	letter-spacing: 1px;
+}
+
+/* Edge fade gradients */
+.edge-fade {
+	position: absolute;
+	top: 0;
+	width: 150px;
+	pointer-events: none;
+	z-index: 6;
+}
+
+.edge-fade-left {
+	left: 0;
+	background: linear-gradient(to right, var(--color-bg-app), transparent);
+}
+
+.edge-fade-right {
+	right: 0;
+	background: linear-gradient(to left, var(--color-bg-app), transparent);
+}
+
+.edge-fade.ticker-bottom {
+	bottom: 0;
+	top: auto;
+	height: var(--ticker-height);
+}
+
+.edge-fade.ticker-top {
+	top: 0;
+	bottom: auto;
+	height: var(--ticker-height);
+}
+
+.edge-fade.ticker-center {
+	top: 50%;
+	transform: translateY(-50%);
+	height: 120px;
+}
+
+/* Responsive adjustments for different screen sizes */
+@media (max-width: 1920px) {
+	:root {
+		--ticker-height: 80px;
+		--ticker-clock-size: 3rem; /* 48px */
+	}
+
+	.clock {
+		top: 30px;
+		right: 40px;
+	}
+
+	.ticker {
+		height: var(--ticker-height);
+	}
+
+	.calendar-indicator {
+		height: 32px;
+	}
+
+	.edge-fade.ticker-bottom,
+	.edge-fade.ticker-top {
+		height: var(--ticker-height);
+	}
+}
+
+@media (min-width: 3840px) {
+	/* 4K displays */
+	:root {
+		--ticker-height: var(--ticker-height-4k); /* 150px */
+		--ticker-clock-size: 6rem; /* 96px */
+		--safe-margin: var(--safe-margin-4k); /* 64px */
+	}
+
+	.clock {
+		top: var(--safe-margin);
+		right: var(--safe-margin);
+	}
+
+	.ticker {
+		height: var(--ticker-height);
+	}
+
+	.event {
+		gap: var(--space-6);
+		padding: 0 var(--space-8);
+	}
+
+	.calendar-indicator {
+		width: 12px;
+		height: 60px;
+	}
+
+	.edge-fade {
+		width: 250px;
+	}
+
+	.edge-fade.ticker-bottom,
+	.edge-fade.ticker-top {
+		height: var(--ticker-height);
+	}
+}
+
+/* Prevent any text selection */
+* {
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+/* Hide scrollbars */
+::-webkit-scrollbar {
+	display: none;
+}
+
+* {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}

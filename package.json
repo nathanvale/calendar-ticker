@@ -4,18 +4,20 @@
 	"private": true,
 	"description": "Calendar ticker application",
 	"workspaces": [
-		"frontend"
+		"apps/*",
+		"packages/*"
 	],
 	"scripts": {
-		"test": "bun run --filter '*' test",
+		"test": "bun run --filter '@calendar-ticker/*' test",
 		"typecheck": "bun run --filter '*' typecheck",
 		"format": "bun run biome format --write .",
 		"format:check": "bun run biome format .",
 		"lint": "bun run biome lint .",
 		"check": "bun run biome check --write .",
 		"ci": "bun --filter '*' typecheck && bun run check && bun --filter '*' test && bun --filter '*' build",
-		"dev": "bun run --filter 'calendar-ticker-frontend' dev",
-		"build": "bun run --filter 'calendar-ticker-frontend' build",
+		"dev": "bun run --filter '@calendar-ticker/frontend' dev",
+		"build": "bun run --filter '@calendar-ticker/frontend' build",
+		"storybook": "bun run --filter '@calendar-ticker/storybook' storybook",
 		"prepare": "husky"
 	},
 	"devDependencies": {

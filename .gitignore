@@ -67,3 +67,6 @@ coverage/
 
 # Turbo/build cache
 .turbo/
+
+# pnpm workspace config (local only, used for IDE/tooling)
+pnpm-workspace.yaml

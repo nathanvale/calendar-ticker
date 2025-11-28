@@ -6,12 +6,12 @@ A beautiful, OLED-optimised news ticker displaying your Google Calendar events. 
 
 ## Features
 
-- 📺 **News ticker style** - Smooth horizontal scrolling like CNN/Bloomberg
-- 🎨 **Colour-coded calendars** - Each calendar gets its own accent colour
-- 🌑 **OLED optimised** - Pure black background, no burn-in risk
-- ⚡ **Live updates** - WebSocket connection for real-time event changes
-- 🔧 **Configurable filters** - Show only important events, specific calendars, etc.
-- 🖥️ **Designed for TV** - Montserrat font, readable from across the room
+- **News ticker style** - Smooth horizontal scrolling like CNN/Bloomberg
+- **Colour-coded calendars** - Each calendar gets its own accent colour
+- **OLED optimised** - Pure black background, no burn-in risk
+- **Live updates** - WebSocket connection for real-time event changes
+- **Configurable filters** - Show only important events, specific calendars, etc.
+- **Designed for TV** - Montserrat font, readable from across the room
 
 ## Quick Start
 
@@ -65,18 +65,18 @@ calendar_colours:
 filters:
   # Only show events starting within this many hours
   hours_ahead: 24
-  
+
   # Keywords that mark an event as "important" (shown with emphasis)
   important_keywords:
     - "!"
     - "IMPORTANT"
     - "urgent"
-  
+
   # Exclude events with these keywords
   exclude_keywords:
     - "lunch"
     - "commute"
-  
+
   # Include all-day events?
   include_all_day: false
 
@@ -84,13 +84,13 @@ filters:
 display:
   # Scroll speed (pixels per second)
   scroll_speed: 50
-  
+
   # Pause on each event (seconds, 0 for continuous scroll)
   pause_duration: 3
-  
+
   # Time format (12h or 24h)
   time_format: "12h"
-  
+
   # Show "in X mins" instead of absolute time for near events
   relative_time_threshold_mins: 60
 
