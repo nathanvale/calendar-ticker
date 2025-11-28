@@ -1,0 +1,84 @@
+# Calendar Ticker Configuration
+# Copy this to config.yaml and customise
+
+# Which calendars to display
+# Use 'primary' for your main calendar, or email addresses for shared calendars
+# Leave empty [] to show all calendars
+calendars:
+  - primary
+
+# Calendar colours (hex codes)
+# Map calendar IDs to colours for the ticker
+calendar_colours:
+  primary: "#4285f4"           # Google blue
+  # work@gmail.com: "#ea4335"  # Red
+  # family@group.calendar.google.com: "#34a853"  # Green
+  # birthdays: "#fbbc04"       # Yellow
+
+# Default colour for calendars not in the list above
+default_colour: "#9e9e9e"
+
+# Event filtering
+filters:
+  # Only show events starting within this many hours from now
+  hours_ahead: 24
+  
+  # Keywords in event title that mark it as "important"
+  # These events will be shown with emphasis (larger, highlighted)
+  important_keywords:
+    - "!"
+    - "[!]"
+    - "IMPORTANT"
+    - "urgent"
+  
+  # Exclude events containing these keywords (case-insensitive)
+  exclude_keywords: []
+    # - "lunch"
+    # - "commute"
+    # - "blocked"
+  
+  # Include all-day events in the ticker?
+  include_all_day: true
+  
+  # Only show events where you are the organiser or have accepted?
+  # (filters out declined/tentative events)
+  only_accepted: true
+
+# Display settings
+display:
+  # Scroll speed in pixels per second
+  # Slower = easier to read, faster = fits more events
+  scroll_speed: 60
+  
+  # Pause duration on each event in seconds
+  # Set to 0 for continuous scrolling
+  pause_duration: 0
+  
+  # Gap between events in pixels
+  event_gap: 100
+  
+  # Time format: "12h" or "24h"
+  time_format: "12h"
+  
+  # For events starting within this many minutes, show "in X mins"
+  # instead of the absolute time. Set to 0 to always show absolute time.
+  relative_time_threshold_mins: 120
+  
+  # Show calendar name/colour indicator before each event
+  show_calendar_indicator: true
+  
+  # Ticker position: "bottom", "top", or "center"
+  position: "bottom"
+  
+  # Font size in pixels (will scale for important events)
+  font_size: 42
+  
+  # Show a subtle clock in the corner?
+  show_clock: true
+
+# How often to refresh calendar data (in seconds)
+# Google Calendar API has quotas, so don't go too low
+refresh_interval: 300
+
+# Show a message when there are no events
+no_events_message: "No upcoming events today ✨"

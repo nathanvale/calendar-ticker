@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: calendar-ticker-backend
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./credentials.json:/app/credentials.json:ro
+      - ./token.json:/app/token.json
+    environment:
+      - TZ=Australia/Melbourne
+    restart: unless-stopped
+    networks:
+      - ticker-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_WS_URL=ws://localhost:8080/ws
+    container_name: calendar-ticker-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - ticker-network
+
+networks:
+  ticker-network:
+    driver: bridge

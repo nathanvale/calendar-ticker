@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets - DO NOT COMMIT THESE
+credentials.json
+token.json
+config.yaml
+
+# Logs
+*.log
+logs/
+
+# Docker
+.docker/
+
+# Environment
+.env
+.env.local
+.env.*.local
