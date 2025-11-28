@@ -13,7 +13,7 @@
 		"format:check": "bun run biome format .",
 		"lint": "bun run biome lint .",
 		"check": "bun run biome check --write .",
-		"ci": "bun --filter '*' typecheck && bun run check && bun --filter '*' test",
+		"ci": "bun --filter '*' typecheck && bun run check && bun --filter '*' test && bun --filter '*' build",
 		"dev": "bun run --filter 'calendar-ticker-frontend' dev",
 		"build": "bun run --filter 'calendar-ticker-frontend' build",
 		"prepare": "husky"
