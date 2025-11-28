@@ -6,15 +6,15 @@
  * for identifying token types and resolving CSS variable values.
  */
 
-import { beforeEach, describe, expect, it, mock } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+import type { TokenGroup } from "../tokens";
 import {
 	isColorToken,
 	isFontSizeToken,
 	isRadiusToken,
 	isSpacingToken,
 	resolveTokenValues,
-} from "../components/TokenShowcase";
-import type { TokenGroup } from "../tokens";
+} from "./TokenShowcase";
 
 describe("TokenShowcase Utility Functions", () => {
 	describe("isColorToken", () => {
@@ -101,8 +101,16 @@ describe("TokenShowcase Utility Functions", () => {
 		// Mock getComputedStyle
 		const mockGetPropertyValue = mock((_prop: string) => "");
 
+		// Store originals to restore after tests
+		let originalDocument: unknown;
+		let originalGetComputedStyle: unknown;
+
 		beforeEach(() => {
 			mockGetPropertyValue.mockReset();
+
+			// Store originals
+			originalDocument = globalThis.document;
+			originalGetComputedStyle = globalThis.getComputedStyle;
 
 			// Mock document.documentElement
 			(globalThis as Record<string, unknown>).document = {
@@ -113,6 +121,13 @@ describe("TokenShowcase Utility Functions", () => {
 			(globalThis as Record<string, unknown>).getComputedStyle = mock(() => ({
 				getPropertyValue: mockGetPropertyValue,
 			}));
+		});
+
+		afterEach(() => {
+			// Restore originals so other tests aren't affected
+			(globalThis as Record<string, unknown>).document = originalDocument;
+			(globalThis as Record<string, unknown>).getComputedStyle =
+				originalGetComputedStyle;
 		});
 
 		it("should resolve primitive color tokens", () => {

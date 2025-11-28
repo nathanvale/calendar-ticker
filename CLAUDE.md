@@ -29,22 +29,33 @@ LG OLED TV-optimised news ticker displaying Google Calendar events on big-screen
 
 ```
 calendar-ticker/
-├── backend/                 # Python FastAPI backend
-│   ├── main.py             # FastAPI app, WebSocket, refresh loop
-│   ├── calendar_service.py # Google Calendar API integration
-│   ├── requirements.txt    # Python dependencies
-│   └── Dockerfile
-├── frontend/               # React TypeScript frontend (Bun workspace)
-│   ├── src/
-│   │   ├── App.jsx        # Main ticker component, WebSocket client
-│   │   ├── App.css        # OLED-optimized styles (pure black)
-│   │   ├── main.jsx       # React entry point
-│   │   └── app.test.tsx   # Bun test placeholder
-│   ├── vite.config.js     # Vite config with proxy to backend
-│   ├── package.json       # Frontend workspace
-│   ├── tsconfig.json      # Extends root TS config
-│   ├── Dockerfile         # Frontend container (Nginx)
-│   └── nginx.conf         # Nginx reverse proxy
+├── apps/                    # Bun monorepo apps
+│   ├── backend/            # Python FastAPI backend
+│   │   ├── main.py         # FastAPI app, WebSocket, refresh loop
+│   │   ├── calendar_service.py # Google Calendar API integration
+│   │   ├── requirements.txt # Python dependencies
+│   │   └── Dockerfile
+│   ├── frontend/           # React TypeScript frontend
+│   │   ├── src/
+│   │   │   ├── App.jsx    # Main ticker component, WebSocket client
+│   │   │   ├── App.css    # OLED-optimized styles (pure black)
+│   │   │   ├── main.jsx   # React entry point
+│   │   │   └── app.test.tsx # Bun test placeholder
+│   │   ├── vite.config.js # Vite config with proxy to backend
+│   │   ├── package.json   # Frontend workspace
+│   │   ├── tsconfig.json  # Extends root TS config
+│   │   ├── Dockerfile     # Frontend container (Nginx)
+│   │   └── nginx.conf     # Nginx reverse proxy
+│   └── storybook/          # Storybook for design system
+│       ├── .storybook/    # Storybook configuration
+│       └── package.json   # Storybook workspace
+├── packages/               # Shared packages
+│   └── design-system/     # Shared design tokens & components
+│       ├── src/
+│       │   ├── tokens/    # Design tokens (colors, spacing, typography)
+│       │   ├── components/ # Reusable components
+│       │   └── styles/    # Global styles
+│       └── package.json
 ├── .husky/                # Git hooks (commitlint, pre-commit CI)
 ├── package.json           # Root workspace config
 ├── tsconfig.json          # TypeScript base (strict mode)
@@ -59,15 +70,19 @@ calendar-ticker/
 
 ```bash
 # Development
-bun install              # Install dependencies
+bun install              # Install dependencies (all workspaces)
 bun run dev              # Start frontend (Vite :5173)
+bun run storybook        # Start Storybook dev server
 docker-compose -f docker-compose.dev.yml up  # Full stack
 
 # Build & Test
 bun run build            # Build frontend (Vite → dist/)
-bun run test             # Run Bun tests
-bun run typecheck        # TypeScript check
+bun run test             # Run Bun tests (all workspaces)
+bun run typecheck        # TypeScript check (all workspaces)
 bun run check            # Biome lint + format (--write)
+bun run lint             # Biome lint only (no format)
+bun run format           # Biome format only (--write)
+bun run format:check     # Biome format check (no write)
 bun run ci               # Full CI: typecheck + lint + test + build
 
 # Production
@@ -79,16 +94,17 @@ docker-compose down            # Stop
 ## Code Conventions
 
 ### TypeScript (Frontend)
-- **Strict mode** enabled
-- **Biome**: Tabs, double quotes, semicolons
+- **Strict mode** enabled (+ `noUncheckedIndexedAccess`, `noImplicitOverride`)
+- **Biome**: Tabs, double quotes, semicolons, recommended rules
 - **React**: Functional components, hooks only
 - **File naming**: `kebab-case.jsx/tsx`
+- **Monorepo**: Bun workspaces (`apps/*`, `packages/*`)
 
 ### Python (Backend)
 - **Python 3.11+**, FastAPI with async/await
 - **Type hints**: `-> dict`, `list[CalendarEvent]`
 - **Dataclasses** for models
-- **Timezone**: Australia/Melbourne (hardcoded in `calendar_service.py:145`)
+- **Timezone**: Australia/Melbourne (hardcoded in `apps/backend/calendar_service.py:145`)
 
 ### Git
 - **Conventional Commits** enforced: `type(scope): subject`
@@ -99,10 +115,11 @@ docker-compose down            # Stop
 
 | File | Purpose |
 |------|---------|
-| `backend/main.py` | FastAPI app, WebSocket endpoint, background refresh |
-| `backend/calendar_service.py` | Google Calendar API, OAuth flow |
-| `frontend/src/App.jsx` | Ticker component, WebSocket client, animation |
-| `frontend/src/App.css` | OLED styles (pure black #000) |
+| `apps/backend/main.py` | FastAPI app, WebSocket endpoint, background refresh |
+| `apps/backend/calendar_service.py` | Google Calendar API, OAuth flow |
+| `apps/frontend/src/App.jsx` | Ticker component, WebSocket client, animation |
+| `apps/frontend/src/App.css` | OLED styles (pure black #000) |
+| `packages/design-system/src/tokens/index.ts` | Design tokens (colors, spacing, typography) |
 | `config.yaml` | User config (copy from example, not in git) |
 
 ## Security
@@ -122,6 +139,7 @@ docker-compose down            # Stop
 | Frontend build fails | `bun run typecheck` to check TS errors |
 | Pre-commit hook fails | Fix errors from CI (typecheck/lint/test/build) |
 | Debug WebSocket | `docker-compose logs -f backend` or `wscat -c ws://localhost:8000/ws` |
+| Workspace dependency issues | Run `bun install` from project root, check package.json workspaces |
 
 ## Configuration
 
@@ -138,11 +156,26 @@ docker-compose down            # Stop
 | `display.time_format` | `"12h"` | `"12h"` or `"24h"` |
 | `refresh_interval` | 300 | Seconds between API fetches |
 
+## Design System
+
+The project now includes a shared design system package:
+
+- **Location**: `packages/design-system/`
+- **Exports**: Design tokens (colors, spacing, typography), components
+- **Storybook**: Available at `bun run storybook` for visual development
+- **Testing**: Comprehensive tests for design tokens and components
+
+**Key Components:**
+- `TokenShowcase` — Visual display of design tokens
+- Design tokens defined in `packages/design-system/src/tokens/index.ts`
+
 ## Testing
 
 - **Framework**: Bun test
-- **Pattern**: `*.test.tsx` alongside source
+- **Pattern**: `*.test.ts` colocated alongside source files (e.g., `index.ts` → `index.test.ts`)
+- **DOM Setup**: `bunfig.toml` preloads `test-setup.ts` for happy-dom globals
 - **Backend**: No tests yet
+- **Design System**: Full test coverage for tokens and components
 
 ## Resources
 
